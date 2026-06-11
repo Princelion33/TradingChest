@@ -26,6 +26,9 @@ export interface RectTextStyle {
 
 const rectText: FigureTemplate<RectTextAttrs, RectTextStyle> = {
   name: 'rectText',
+  checkEventOn: () => {
+    return false
+  },
   draw: (ctx: CanvasRenderingContext2D, attrs: RectTextAttrs, styles: RectTextStyle) => {
     try {
       if (!ctx || !attrs) return
