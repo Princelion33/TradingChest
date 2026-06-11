@@ -26,8 +26,55 @@ export interface RectTextStyle {
 
 const rectText: FigureTemplate<RectTextAttrs, RectTextStyle> = {
   name: 'rectText',
-  checkEventOn: () => {
-    return false
+  checkEventOn: (coordinate: any, attrs: RectTextAttrs, styles: RectTextStyle) => {
+    try {
+      if (!coordinate || !attrs) return false
+      const { x, y, text, align = 'center', baseline = 'middle' } = attrs
+      if (typeof x !== 'number' || typeof y !== 'number' || text === undefined || text === null) return false
+
+      const textStr = String(text)
+      const safeStyles = styles || {}
+      const fontSize = Number(safeStyles.size) || 12
+      
+      const textWidth = textStr.length * (fontSize * 0.6)
+      const textHeight = fontSize
+
+      const paddingLeft = Number(safeStyles.paddingLeft) ?? 8
+      const paddingRight = Number(safeStyles.paddingRight) ?? 8
+      const paddingTop = Number(safeStyles.paddingTop) ?? 4
+      const paddingBottom = Number(safeStyles.paddingBottom) ?? 4
+
+      const rectWidth = textWidth + paddingLeft + paddingRight
+      const rectHeight = textHeight + paddingTop + paddingBottom
+
+      let rectX: number
+      if (align === 'left') {
+        rectX = x
+      } else if (align === 'right') {
+        rectX = x - rectWidth
+      } else { // center
+        rectX = x - rectWidth / 2
+      }
+
+      let rectY: number
+      if (baseline === 'top') {
+        rectY = y
+      } else if (baseline === 'bottom') {
+        rectY = y - rectHeight
+      } else { // middle
+        rectY = y - rectHeight / 2
+      }
+
+      return (
+        coordinate.x >= rectX &&
+        coordinate.x <= rectX + rectWidth &&
+        coordinate.y >= rectY &&
+        coordinate.y <= rectY + rectHeight
+      )
+    } catch (err) {
+      console.error("Error in checkEventOn:", err)
+      return false
+    }
   },
   draw: (ctx: CanvasRenderingContext2D, attrs: RectTextAttrs, styles: RectTextStyle) => {
     try {
